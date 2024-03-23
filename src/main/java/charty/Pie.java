@@ -15,7 +15,6 @@ import javafx.util.Pair;
 public class Pie implements Chart {
     ObservableList<PieChart.Data> state = FXCollections.observableArrayList();
     ObservableList<Node> recievers = FXCollections.observableArrayList();
-    int inputReceiverCount = 0;
     PieChart chart = new PieChart(state);
 
     static Pie empty() {
@@ -24,7 +23,6 @@ public class Pie implements Chart {
 
     Pie(ObservableList<PieChart.Data> state) {
         this.state = state;
-        this.inputReceiverCount = state.size();
         this.chart = new PieChart(state);
         for (PieChart.Data data : state) {
             createInputReceiver(data.getName(), data.getPieValue(), data);
@@ -42,7 +40,6 @@ public class Pie implements Chart {
     public void onClear() {
         state.clear();
         recievers.clear();
-        inputReceiverCount = 0;
     }
 
     @Override
@@ -51,36 +48,34 @@ public class Pie implements Chart {
     }
 
     public Node createInputReceiver(String initName, Double initVal) {
-        state.add(new PieChart.Data(initName, initVal));
-        var nodeState = state.get(inputReceiverCount);
+        var nodeState = new PieChart.Data(initName, initVal);
+        state.add(nodeState);
+
         var node = createInputReceiver(initName, initVal, nodeState);
-        inputReceiverCount += 1;
         return node;
     }
 
     public Node createInputReceiver(String initName, Double initVal, PieChart.Data nodeState) {
-        var nameLabel = new Label("name: ");
         var name = new TextField(initName);
         name.textProperty()
                 .addListener((observable, oldValue, newValue) -> nodeState.setName(newValue));
 
-        var sizeLabel = new Label("size: ");
         var size = new TextField(initVal.toString());
         size.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.equals(""))
+                return;
             try {
                 nodeState.setPieValue(Double.parseDouble(newValue));
             } catch (NumberFormatException e) {
                 size.setText(oldValue);
             }
         });
-        var box = new GridPane();
 
-        box.addRow(0, nameLabel, name);
-        box.addRow(1, sizeLabel, size);
-
-        recievers.add(box);
-
-        return box;
+        var pane = new GridPane();
+        pane.addRow(0, new Label("name: "), name);
+        pane.addRow(1, new Label("size: "), size);
+        recievers.add(pane);
+        return pane;
     }
 
     @Override
@@ -95,18 +90,15 @@ public class Pie implements Chart {
 }
 
 class SerializablePie implements SerializableChartProxy {
-    int inputReceiverCount;
     List<Pair<String, Double>> state;
 
     SerializablePie(ObservableList<PieChart.Data> state) {
-        this.inputReceiverCount = state.size();
         this.state = state.stream()
                 .map(x -> new Pair<String, Double>(x.getName(), x.getPieValue()))
                 .collect(Collectors.toList());
     }
 
     SerializablePie(List<Pair<String, Double>> state) {
-        this.inputReceiverCount = state.size();
         this.state = state;
     }
 

@@ -1,7 +1,6 @@
 package charty;
 
 import javafx.geometry.HPos;
-import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -52,11 +51,14 @@ public class UI {
 
         var add = new Button("Add");
         add.setOnAction(actionEvent -> chart.createInputReceiver());
+        add.setMaxWidth(Double.MAX_VALUE);
 
         var pane = new GridPane();
         GridPane.setVgrow(segments, Priority.ALWAYS);
         GridPane.setHgrow(chart.node(), Priority.ALWAYS);
         GridPane.setHgrow(add, Priority.SOMETIMES);
+        GridPane.setFillWidth(add, true);
+
         GridPane.setHalignment(chart.node(), HPos.CENTER);
         GridPane.setHalignment(add, HPos.CENTER);
 

@@ -12,6 +12,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class App extends Application {
     Chart chart;
@@ -34,8 +35,10 @@ public class App extends Application {
 
         var newSubMenu = new Menu("New");
         var newPieChart = new MenuItem("pie chart");
-        newSubMenu.getItems().addAll(newPieChart);
-        newSubMenu.setOnAction(actionEvent -> newPieChart(stage));
+        var newLineChart = new MenuItem("line chart");
+        newSubMenu.getItems().addAll(newPieChart, newLineChart);
+        newPieChart.setOnAction(actionEvent -> newPieChart(stage));
+        newLineChart.setOnAction(actionEvent -> newLineChart(stage));
 
         var save = new MenuItem("Save");
         save.setOnAction(actionEvent -> save(stage));
@@ -54,17 +57,37 @@ public class App extends Application {
                 new Alert(AlertType.ERROR, "No open chart", ButtonType.CLOSE).showAndWait();
                 return;
             }
-            ImageExporter.exportPng(saveFile, chart);
+
+            var f = new FileChooser();
+            f.setTitle("Save as");
+            f.setSelectedExtensionFilter(new ExtensionFilter("JPEG file", "*.jpeg", "*.jpg"));
+            var file = f.showSaveDialog(stage);
+            if (file != null) {
+                ImageExporter.exportPng(file, chart);
+            }
         });
         exportJpeg.setOnAction(x -> {
             if (chart == null) {
                 new Alert(AlertType.ERROR, "No open chart", ButtonType.CLOSE).showAndWait();
                 return;
             }
-            ImageExporter.exportJpeg(saveFile, chart);
+
+            var f = new FileChooser();
+            f.setTitle("Save as");
+            f.setSelectedExtensionFilter(new ExtensionFilter("PNG file", "*.png"));
+            var file = f.showSaveDialog(stage);
+            if (file != null) {
+                ImageExporter.exportPng(file, chart);
+            }
+            ImageExporter.exportJpeg(file, chart);
         });
 
         return bar;
+    }
+
+    void newLineChart(Stage stage) {
+        chart = Line.empty();
+        ui.setChart(chart);
     }
 
     void newPieChart(Stage stage) {
