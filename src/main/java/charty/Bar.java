@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -16,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class Bar extends Chart {
@@ -32,6 +36,12 @@ public class Bar extends Chart {
         chart.setBarGap(5.0);
         chart.setCategoryGap(5.0);
         this.reload();
+
+        var periodicReload = new Timeline(new KeyFrame(Duration.seconds(0.5), action -> {
+            this.reload();
+        }));
+        periodicReload.setCycleCount(Animation.INDEFINITE);
+        periodicReload.play();
 
         for (Pair<String, Number> pair : data) {
             createInputReceiver(new XYChart.Data<String, Number>(pair.getKey(), pair.getValue()));
