@@ -15,7 +15,7 @@ import java.awt.image.BufferedImage;
 
 public class ImageExporter {
     private static void export(File file, Chart chart, String format) {
-        WritableImage image = chart.node().snapshot(null, null);
+        WritableImage image = chart.getNode().snapshot(null, null);
         BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
         try (var out = new FileImageOutputStream(file)) {
             file.createNewFile();

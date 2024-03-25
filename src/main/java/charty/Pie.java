@@ -12,27 +12,36 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
-public class Pie implements Chart {
-    ObservableList<PieChart.Data> state = FXCollections.observableArrayList();
-    ObservableList<Node> recievers = FXCollections.observableArrayList();
-    PieChart chart = new PieChart(state);
+/**
+ * A Piechart and it's associated state and input receivers.
+ */
+public class Pie extends Chart {
+    private ObservableList<PieChart.Data> state = FXCollections.observableArrayList();
+    private ObservableList<Node> recievers = FXCollections.observableArrayList();
+    private PieChart chart = new PieChart(state);
 
+    /**
+     * Default Piechart.
+     * 
+     * @return piechart with one slice.
+     */
     static Pie empty() {
         return new Pie(FXCollections.observableArrayList(new PieChart.Data("", 1)));
     }
 
+    /**
+     * Constructs new Pie based on data.
+     * 
+     * @param state List of slices.
+     */
     Pie(ObservableList<PieChart.Data> state) {
-        this.state = state;
-        this.chart = new PieChart(state);
         for (PieChart.Data data : state) {
-            createInputReceiver(data.getName(), data.getPieValue(), data);
+            createInputReceiver(data);
         }
     }
 
     @Override
-    public Node node() {
-        if (chart == null)
-            chart = new PieChart(state);
+    public Node getNode() {
         return chart;
     }
 
@@ -44,23 +53,17 @@ public class Pie implements Chart {
 
     @Override
     public Node createInputReceiver() {
-        return createInputReceiver("", 1.0);
+        return createInputReceiver(new PieChart.Data("", 1.0));
     }
 
-    public Node createInputReceiver(String initName, Double initVal) {
-        var nodeState = new PieChart.Data(initName, initVal);
+    public Node createInputReceiver(PieChart.Data nodeState) {
         state.add(nodeState);
 
-        var node = createInputReceiver(initName, initVal, nodeState);
-        return node;
-    }
-
-    public Node createInputReceiver(String initName, Double initVal, PieChart.Data nodeState) {
-        var name = new TextField(initName);
+        var name = new TextField(nodeState.getName());
         name.textProperty()
                 .addListener((observable, oldValue, newValue) -> nodeState.setName(newValue));
 
-        var size = new TextField(initVal.toString());
+        var size = new TextField(((Double) nodeState.getPieValue()).toString());
         size.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.equals(""))
                 return;

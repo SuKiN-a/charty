@@ -11,23 +11,68 @@ import java.io.ObjectOutputStream;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 
-public interface Chart {
-    Node node();
+/**
+ * Interface that all charty-supported charts implement.
+ * In addition to these methods, Charts also have a static
+ * `empty` method to create a default version of the chart.
+ */
+public abstract class Chart {
+    /**
+     * Gets the actual visual `Chart`.
+     * 
+     * @return the renderable chart.
+     */
+    abstract Node getNode();
 
-    void onClear();
+    /**
+     * Resets chart to empty state.
+     */
+    abstract void onClear();
 
-    Node createInputReceiver();
+    /**
+     * Creates an input receiver(UI element that controls chart state).
+     * 
+     * @return new input reciever.
+     */
+    abstract Node createInputReceiver();
 
-    ObservableList<Node> getInputRecievers();
+    /**
+     * Gets all the input recievers currently associated with the chart.
+     * 
+     * @return all input recievers.
+     */
 
-    SerializableChartProxy serializable();
+    abstract ObservableList<Node> getInputRecievers();
 
+    /**
+     * Returns a serializable Object that encodes all chart data.
+     * 
+     * @return
+     */
+    abstract SerializableChartProxy serializable();
+
+    /**
+     * Writes chart into file.
+     * 
+     * @param chart    Chart to write into file.
+     * @param saveFile File to be written into.
+     * @throws IOException
+     */
     static void save(Chart chart, File saveFile) throws IOException {
         try (var os = new FileOutputStream(saveFile); var objectOutput = new ObjectOutputStream(os)) {
             objectOutput.writeObject(chart.serializable());
         }
     }
 
+    /**
+     * Reads and deserializes chart.
+     * 
+     * @param file File to deserialize from.
+     * @return Deserialized chart.
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     static Chart load(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
         try (var in = new FileInputStream(file); var objectInput = new ObjectInputStream(in)) {
             return ((SerializableChartProxy) objectInput.readObject()).intoChart();

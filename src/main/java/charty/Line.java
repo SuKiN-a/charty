@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.HPos;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -13,20 +14,21 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.util.Pair;
 
-public class Line implements Chart {
+public class Line extends Chart {
     ObservableList<XYChart.Data<Number, Number>> state = FXCollections.observableArrayList();
     ObservableList<Node> recievers = FXCollections.observableArrayList();
-    NumberAxis xAxis = new NumberAxis();
-    NumberAxis yAxis = new NumberAxis();
-    LineChart<Number, Number> chart = new LineChart<>(xAxis, yAxis);
+    LineChart<Number, Number> chart = new LineChart<>(new NumberAxis(), new NumberAxis());
 
     Line(List<Pair<Number, Number>> data) {
-        chart.setLegendVisible(false);
+        ObservableList<XYChart.Series<Number, Number>> l = FXCollections.observableArrayList();
+        l.add(new XYChart.Series<>(state));
 
-        xAxis.setLabel("X");
-        yAxis.setLabel("Y");
+        chart.setLegendVisible(false);
+        chart.setData(l);
+
         for (Pair<Number, Number> pair : data) {
             createInputReceiver(new XYChart.Data<Number, Number>(pair.getKey(), pair.getValue()));
         }
@@ -37,13 +39,7 @@ public class Line implements Chart {
     }
 
     @Override
-    public Node node() {
-        ObservableList<XYChart.Series<Number, Number>> l = FXCollections.observableArrayList();
-        l.add(new XYChart.Series<>(state));
-        chart.setData(l);
-
-        if (chart == null)
-            chart = new LineChart<>(xAxis, yAxis);
+    public Node getNode() {
         return chart;
     }
 
@@ -51,7 +47,6 @@ public class Line implements Chart {
     public void onClear() {
         state.clear();
         recievers.clear();
-        state.clear();
     }
 
     @Override
@@ -62,8 +57,8 @@ public class Line implements Chart {
     public Node createInputReceiver(XYChart.Data<Number, Number> nodeState) {
         state.add(nodeState);
 
-        Label xLabel = new Label("x");
-        var x = new TextField("");
+        Label xLabel = new Label("X");
+        var x = new TextField(nodeState.getXValue().toString());
         x.textProperty().addListener((actionEvent, oldVal, newVal) -> {
             if (newVal.equals(""))
                 return;
@@ -74,8 +69,8 @@ public class Line implements Chart {
             }
         });
 
-        Label yLabel = new Label("y");
-        var y = new TextField("");
+        Label yLabel = new Label("Y");
+        var y = new TextField(nodeState.getYValue().toString());
         y.textProperty().addListener((actionEvent, oldVal, newVal) -> {
             if (newVal.equals(""))
                 return;
@@ -88,8 +83,11 @@ public class Line implements Chart {
 
         var pane = new GridPane();
         recievers.add(pane);
-        GridPane.setFillWidth(xLabel, true);
-        xLabel.setMaxWidth(Double.MAX_VALUE);
+
+        GridPane.setHgrow(xLabel, Priority.ALWAYS);
+        GridPane.setHalignment(xLabel, HPos.CENTER);
+        GridPane.setHgrow(yLabel, Priority.ALWAYS);
+        GridPane.setHalignment(yLabel, HPos.CENTER);
 
         pane.addRow(0, xLabel, x);
         pane.addRow(1, yLabel, y);

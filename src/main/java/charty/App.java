@@ -15,9 +15,9 @@ import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 public class App extends Application {
-    Chart chart;
-    File saveFile;
-    UI ui;
+    private Chart chart;
+    private File saveFile;
+    private UI ui;
 
     @Override
     public void start(Stage stage) {
@@ -27,6 +27,12 @@ public class App extends Application {
         stage.show();
     }
 
+    /**
+     * Creates a new menu bar.
+     * 
+     * @param stage
+     * @return Newly created menu bar.
+     */
     MenuBar menuBar(Stage stage) {
         var bar = new MenuBar();
 
@@ -34,11 +40,13 @@ public class App extends Application {
         bar.getMenus().addAll(fileMenu);
 
         var newSubMenu = new Menu("New");
-        var newPieChart = new MenuItem("pie chart");
-        var newLineChart = new MenuItem("line chart");
-        newSubMenu.getItems().addAll(newPieChart, newLineChart);
+        var newPieChart = new MenuItem("Pie chart");
+        var newLineChart = new MenuItem("Line chart");
+        var newBarChart = new MenuItem("Bar chart");
+        newSubMenu.getItems().addAll(newPieChart, newLineChart, newBarChart);
         newPieChart.setOnAction(actionEvent -> newPieChart(stage));
         newLineChart.setOnAction(actionEvent -> newLineChart(stage));
+        newBarChart.setOnAction(actionEvent -> newBarChart(stage));
 
         var save = new MenuItem("Save");
         save.setOnAction(actionEvent -> save(stage));
@@ -46,9 +54,9 @@ public class App extends Application {
         var load = new MenuItem("Open");
         load.setOnAction(actionEvent -> load(stage));
 
-        var export = new Menu("export");
-        var exportPng = new MenuItem("as png");
-        var exportJpeg = new MenuItem("as jpeg");
+        var export = new Menu("Export");
+        var exportPng = new MenuItem("As png");
+        var exportJpeg = new MenuItem("As jpeg");
         export.getItems().addAll(exportPng, exportJpeg);
         fileMenu.getItems().addAll(newSubMenu, save, load, export);
 
@@ -57,7 +65,6 @@ public class App extends Application {
                 new Alert(AlertType.ERROR, "No open chart", ButtonType.CLOSE).showAndWait();
                 return;
             }
-
             var f = new FileChooser();
             f.setTitle("Save as");
             f.setSelectedExtensionFilter(new ExtensionFilter("JPEG file", "*.jpeg", "*.jpg"));
@@ -66,12 +73,12 @@ public class App extends Application {
                 ImageExporter.exportPng(file, chart);
             }
         });
+
         exportJpeg.setOnAction(x -> {
             if (chart == null) {
                 new Alert(AlertType.ERROR, "No open chart", ButtonType.CLOSE).showAndWait();
                 return;
             }
-
             var f = new FileChooser();
             f.setTitle("Save as");
             f.setSelectedExtensionFilter(new ExtensionFilter("PNG file", "*.png"));
@@ -79,27 +86,49 @@ public class App extends Application {
             if (file != null) {
                 ImageExporter.exportPng(file, chart);
             }
-            ImageExporter.exportJpeg(file, chart);
         });
 
         return bar;
     }
 
+    /**
+     * Sets the current chart to an empty bar chart and updates the UI.
+     * 
+     * @param stage
+     */
+    void newBarChart(Stage stage) {
+        chart = Bar.empty();
+        ui.setChart(chart);
+    }
+
+    /**
+     * Sets the current chart to an empty line chart and updates the UI.
+     * 
+     * @param stage
+     */
     void newLineChart(Stage stage) {
         chart = Line.empty();
         ui.setChart(chart);
     }
 
+    /**
+     * Sets the current chart to an empty pie chart and updates the UI.
+     * 
+     * @param stage
+     */
     void newPieChart(Stage stage) {
         chart = Pie.empty();
         ui.setChart(chart);
     }
 
+    /**
+     * Opens an existing charty project.
+     * Asks the user to choose a file, deserializes it into a chart,
+     * and updates the UI.
+     * 
+     * @param stage
+     */
     void load(Stage stage) {
-        if (chart == null) {
-            new Alert(AlertType.ERROR, "No open chart", ButtonType.CLOSE).showAndWait();
-            return;
-        }
         var openFileChooser = new FileChooser();
         openFileChooser.setTitle("Open chart project");
         saveFile = openFileChooser.showOpenDialog(stage);
@@ -111,12 +140,23 @@ public class App extends Application {
         } catch (FileNotFoundException e) {
             new Alert(AlertType.ERROR, "File not found", ButtonType.CLOSE).showAndWait();
         } catch (IOException e) {
-            // silence and rethrow because not much can be done about these.
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Saves current chart into a file.
+     * Prompts user for location to save file into
+     * and deserializes the current chart into it.
+     *
+     * @param stage
+     */
     void save(Stage stage) {
+        if (chart == null) {
+            new Alert(AlertType.ERROR, "No open chart", ButtonType.CLOSE).showAndWait();
+            return;
+        }
+
         var saveFileChooser = new FileChooser();
         saveFileChooser.setTitle("Save as");
 
