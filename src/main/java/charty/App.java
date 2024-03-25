@@ -67,7 +67,7 @@ public class App extends Application {
             }
             var f = new FileChooser();
             f.setTitle("Save as");
-            f.setSelectedExtensionFilter(new ExtensionFilter("JPEG file", "*.jpeg", "*.jpg"));
+            f.setSelectedExtensionFilter(new ExtensionFilter("PNG file", "*.png"));
             var file = f.showSaveDialog(stage);
             if (file != null) {
                 ImageExporter.exportPng(file, chart);
@@ -81,7 +81,7 @@ public class App extends Application {
             }
             var f = new FileChooser();
             f.setTitle("Save as");
-            f.setSelectedExtensionFilter(new ExtensionFilter("PNG file", "*.png"));
+            f.setSelectedExtensionFilter(new ExtensionFilter("JPEG file", "*.jpeg", "*.jpg"));
             var file = f.showSaveDialog(stage);
             if (file != null) {
                 ImageExporter.exportPng(file, chart);
