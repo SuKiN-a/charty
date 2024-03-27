@@ -1,12 +1,10 @@
 package charty;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javafx.animation.Animation;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.HPos;
@@ -19,13 +17,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class Bar extends Chart {
-    ObservableList<XYChart.Data<String, Number>> state = FXCollections.observableArrayList();
-    ObservableList<Node> recievers = FXCollections.observableArrayList();
-    BarChart<String, Number> chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
+    private List<XYChart.Data<String, Number>> state = new ArrayList<>();
+    private ObservableList<XYChart.Data<String, Number>> backing_list = FXCollections.observableArrayList();
+    private ObservableList<Node> recievers = FXCollections.observableArrayList();
+    private BarChart<String, Number> chart = new BarChart<>(new CategoryAxis(), new NumberAxis());
 
     static Bar empty() {
         return new Bar(Arrays.asList(new Pair<>("label", 1.0)));
@@ -35,13 +33,7 @@ public class Bar extends Chart {
         chart.setLegendVisible(false);
         chart.setBarGap(5.0);
         chart.setCategoryGap(5.0);
-        this.reload();
-
-        var periodicReload = new Timeline(new KeyFrame(Duration.seconds(0.5), action -> {
-            this.reload();
-        }));
-        periodicReload.setCycleCount(Animation.INDEFINITE);
-        periodicReload.play();
+        reload();
 
         for (Pair<String, Number> pair : data) {
             createInputReceiver(new XYChart.Data<String, Number>(pair.getKey(), pair.getValue()));
@@ -55,36 +47,41 @@ public class Bar extends Chart {
 
     @Override
     public void onClear() {
-        state.clear();
         recievers.clear();
+        state.clear();
+        reload();
     }
 
     @Override
     public Node createInputReceiver() {
-        var nodeState = new XYChart.Data<String, Number>("label" + recievers.size(), 1.0);
+        var nodeState = new XYChart.Data<String, Number>("label" + state.size(), 1.0);
         return createInputReceiver(nodeState);
     }
 
     public Node createInputReceiver(XYChart.Data<String, Number> nodeState) {
         state.add(nodeState);
-
-        this.reload();
+        reload();
 
         var nameLabel = new Label("name");
         var name = new TextField(nodeState.getXValue());
         name.textProperty().addListener((actionEvent, oldVal, newVal) -> {
             nodeState.setXValue(newVal);
+            reload();
         });
 
         var sizeLabel = new Label("size");
         var size = new TextField(nodeState.getYValue().toString());
         size.textProperty().addListener((actionEvent, oldVal, newVal) -> {
-            if (newVal.equals(""))
+            if (newVal.equals("")) {
+                reload();
                 return;
+            }
             try {
                 nodeState.setYValue(Double.parseDouble(size.getText()));
             } catch (NumberFormatException e) {
                 size.setText(oldVal);
+            } finally {
+                reload();
             }
         });
 
@@ -109,7 +106,8 @@ public class Bar extends Chart {
 
     @Override
     public SerializableChartProxy serializable() {
-        return new SerializableBar(this);
+        reload();
+        return new SerializableBar(backing_list);
     }
 
     /*
@@ -120,18 +118,19 @@ public class Bar extends Chart {
      * https://bugs.openjdk.org/browse/JDK-8089250?filter=39543&jql=project%20%3D%20JDK%20AND%20issuetype%20in%20(Bug%2C%20Enhancement)%20AND%20resolution%20%3D%20Unresolved%20AND%20component%20%3D%20javafx%20AND%20text%20~%20%22BarChart%22%20ORDER%20BY%20updated%20DESC 
      */
     public void reload() {
-        ObservableList<XYChart.Series<String, Number>> l = FXCollections.observableArrayList();
-        l.add(new XYChart.Series<>(state));
-
-        chart.setData(l);
+        ObservableList<XYChart.Series<String, Number>> series = FXCollections.observableArrayList();
+        chart.setData(series);
+        backing_list = FXCollections.observableArrayList(state);
+        backing_list.add(new XYChart.Data<String,Number>("", 0));
+        series.add(new XYChart.Series<>(backing_list));
     }
 }
 
 class SerializableBar implements SerializableChartProxy {
     List<Pair<String, Number>> state;
 
-    SerializableBar(Bar bar) {
-        state = bar.state.stream().map(x -> {
+    SerializableBar(ObservableList<XYChart.Data<String, Number>> backing_list) {
+        state = backing_list.stream().map(x -> {
             return new Pair<>(x.getXValue(), x.getYValue());
         }).collect(Collectors.toList());
     }
