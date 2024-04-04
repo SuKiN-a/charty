@@ -1,3 +1,6 @@
+/**
+ * Main charty module.
+ */
 module charty {
     requires transitive javafx.controls;
     requires transitive javafx.swing;

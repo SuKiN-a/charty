@@ -14,11 +14,30 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 
+/**
+ * The App.
+ */
 public class App extends Application {
+    /**
+     * Currently active chart.
+     */
     private Chart chart;
+
+    /**
+     * File which the app will be saved to.
+     */
     private File saveFile;
+
+    /**
+     * The UI controller.
+     */
     private UI ui;
 
+    /**
+     * Starts the app.
+     * 
+     * @param stage Stage onto which the app is rendered.
+     */
     @Override
     public void start(Stage stage) {
         ui = new UI(stage, menuBar(stage));
@@ -30,7 +49,7 @@ public class App extends Application {
     /**
      * Creates a new menu bar.
      * 
-     * @param stage
+     * @param stage Stage onto which the app is rendered.
      * @return Newly created menu bar.
      */
     MenuBar menuBar(Stage stage) {
@@ -94,7 +113,7 @@ public class App extends Application {
     /**
      * Sets the current chart to an empty bar chart and updates the UI.
      * 
-     * @param stage
+     * @param stage Stage onto which the app is rendered.
      */
     void newBarChart(Stage stage) {
         chart = Bar.empty();
@@ -104,7 +123,7 @@ public class App extends Application {
     /**
      * Sets the current chart to an empty line chart and updates the UI.
      * 
-     * @param stage
+     * @param stage Stage onto which the app is rendered.
      */
     void newLineChart(Stage stage) {
         chart = Line.empty();
@@ -114,7 +133,7 @@ public class App extends Application {
     /**
      * Sets the current chart to an empty pie chart and updates the UI.
      * 
-     * @param stage
+     * @param stage Stage onto which the app is rendered.
      */
     void newPieChart(Stage stage) {
         chart = Pie.empty();
@@ -126,7 +145,7 @@ public class App extends Application {
      * Asks the user to choose a file, deserializes it into a chart,
      * and updates the UI.
      * 
-     * @param stage
+     * @param stage Stage onto which the app is rendered.
      */
     void load(Stage stage) {
         var openFileChooser = new FileChooser();
@@ -149,7 +168,7 @@ public class App extends Application {
      * Prompts user for location to save file into
      * and deserializes the current chart into it.
      *
-     * @param stage
+     * @param stage Stage onto which the app is rendered.
      */
     void save(Stage stage) {
         if (chart == null) {
@@ -176,6 +195,11 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Starts charty when invoked
+     * 
+     * @param args this parameter is ignored.
+     */
     public static void main(String[] args) {
         launch(args);
     }

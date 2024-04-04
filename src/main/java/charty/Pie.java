@@ -16,8 +16,19 @@ import javafx.util.Pair;
  * A Piechart and it's associated state and input receivers.
  */
 public class Pie extends Chart {
+    /**
+     * PieChart state.
+     */
     private ObservableList<PieChart.Data> state = FXCollections.observableArrayList();
+
+    /**
+     * Active recievers.
+     */
     private ObservableList<Node> recievers = FXCollections.observableArrayList();
+
+    /**
+     * Active PieChart instance
+     */
     private PieChart chart = new PieChart(state);
 
     /**
@@ -41,21 +52,30 @@ public class Pie extends Chart {
     }
 
     @Override
+    /** {@inheritDoc} */
     public Node getNode() {
         return chart;
     }
 
     @Override
+    /** {@inheritDoc} */
     public void onClear() {
         state.clear();
         recievers.clear();
     }
 
     @Override
+    /** {@inheritDoc} */
     public Node createInputReceiver() {
         return createInputReceiver(new PieChart.Data("", 1.0));
     }
 
+    /**
+     * Creates new input reciever.
+     *
+     * @param nodeState Initial state of input receiver.
+     * @return newly created input receiver.
+     */
     public Node createInputReceiver(PieChart.Data nodeState) {
         state.add(nodeState);
 
@@ -82,30 +102,40 @@ public class Pie extends Chart {
     }
 
     @Override
+    /** {@inheritDoc} */
     public SerializableChartProxy serializable() {
         return new SerializablePie(state);
     }
 
     @Override
+    /** {@inheritDoc} */
     public ObservableList<Node> getInputRecievers() {
         return recievers;
     }
 }
 
+/**
+ * `Serializable` Proxy for the `Pie`
+ */
 class SerializablePie implements SerializableChartProxy {
-    List<Pair<String, Double>> state;
+    /**
+     * List of Slice name, Size.
+     */
+    private List<Pair<String, Double>> state;
 
+    /**
+     * Creates new instance from a Pie.
+     * 
+     * @param state State of the pie to serialize
+     */
     SerializablePie(ObservableList<PieChart.Data> state) {
         this.state = state.stream()
                 .map(x -> new Pair<String, Double>(x.getName(), x.getPieValue()))
                 .collect(Collectors.toList());
     }
 
-    SerializablePie(List<Pair<String, Double>> state) {
-        this.state = state;
-    }
-
     @Override
+    /** {@inheritDoc} */
     public Chart intoChart() {
         return new Pie(FXCollections.observableArrayList(
                 state.stream()

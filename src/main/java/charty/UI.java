@@ -15,23 +15,37 @@ import javafx.stage.Stage;
 /**
  * Controls the UI of the application.
  * This class contains the UI state and the transitions between them.
+ *
  */
 public class UI {
+    /**
+     * The currently active "segments"(Pie slices/Points/Bars) of the Chart.
+     */
     private ListView<Node> segments = new ListView<>();
+    /**
+     * Scene for the UI
+     */
     private Scene scene = new Scene(new GridPane(), 800, 600);
+
+    /**
+     * Menubar on top of the window.
+     */
     private MenuBar menuBar;
 
     /**
      * Creates a new UI.
-     * 
+     *
      * @param stage   Stage to apply the UI to.
-     * @param menuBar
+     * @param menuBar The menu bar to be displayed on top of the window.
      */
     public UI(Stage stage, MenuBar menuBar) {
         this.menuBar = menuBar;
 
         var instructionsLine1 = new Label("Go to File > New to open a new chart project");
         var instructionsLine2 = new Label("Go to File > Open to open an existing project");
+
+        var instructionStyles = "";
+        instructionsLine1.setStyle(instructionStyles);
 
         GridPane.setHgrow(menuBar, Priority.ALWAYS);
         GridPane.setVgrow(instructionsLine1, Priority.ALWAYS);
@@ -54,9 +68,9 @@ public class UI {
 
     /**
      * Updates the UI with the new chart.
-     * This function should be called every time charty needs to switch to another
+     * This function should be called every time charty needs to switch to another.
      * chart.
-     * 
+     *
      * @param chart Chart to switch the UI to.
      */
     public void setChart(Chart chart) {

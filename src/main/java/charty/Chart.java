@@ -41,13 +41,12 @@ public abstract class Chart {
      * 
      * @return all input recievers.
      */
-
     abstract ObservableList<Node> getInputRecievers();
 
     /**
      * Returns a serializable Object that encodes all chart data.
      * 
-     * @return
+     * @return Serializable version of the chart.
      */
     abstract SerializableChartProxy serializable();
 
@@ -56,7 +55,7 @@ public abstract class Chart {
      * 
      * @param chart    Chart to write into file.
      * @param saveFile File to be written into.
-     * @throws IOException
+     * @throws IOException Error during IO.
      */
     static void save(Chart chart, File saveFile) throws IOException {
         try (var os = new FileOutputStream(saveFile); var objectOutput = new ObjectOutputStream(os)) {
@@ -69,9 +68,10 @@ public abstract class Chart {
      * 
      * @param file File to deserialize from.
      * @return Deserialized chart.
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws FileNotFoundException  file is not found.
+     * @throws IOException            Error during IO.
+     * @throws ClassNotFoundException the project instance is of an older
+     *                                version or invalid.
      */
     static Chart load(File file) throws FileNotFoundException, IOException, ClassNotFoundException {
         try (var in = new FileInputStream(file); var objectInput = new ObjectInputStream(in)) {
