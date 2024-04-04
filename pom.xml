@@ -48,8 +48,8 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
-                    <reportOutputDirectory>${project.basedir}/docs</reportOutputDirectory>
-                    <destDir>charty</destDir>
+                    <reportOutputDirectory>${project.basedir}</reportOutputDirectory>
+                    <destDir>api-doc</destDir>
                     <source>21</source>
                     <show>private</show>
                 </configuration>

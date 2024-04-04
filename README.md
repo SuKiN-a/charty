@@ -12,7 +12,7 @@ mvn clean javafx:run
 ```
 
 ## Generating API documentation
-The generated docs will be present in docs/charty/
+The generated docs will be present in api-docs/
 
 ```sh
 mvn clean javafx:jlink javadoc:javadoc
