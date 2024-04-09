@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
@@ -43,9 +44,8 @@ public class UI {
 
         var instructionsLine1 = new Label("Go to File > New to open a new chart project");
         var instructionsLine2 = new Label("Go to File > Open to open an existing project");
-
-        var instructionStyles = "";
-        instructionsLine1.setStyle(instructionStyles);
+        instructionsLine1.setStyle("-fx-font-size: 20;");
+        instructionsLine2.setStyle("-fx-font-size: 20;");
 
         GridPane.setHgrow(menuBar, Priority.ALWAYS);
         GridPane.setVgrow(instructionsLine1, Priority.ALWAYS);
@@ -98,11 +98,18 @@ public class UI {
         GridPane.setHalignment(chart.getNode(), HPos.CENTER);
         GridPane.setHalignment(add, HPos.CENTER);
 
-        pane.add(menuBar, 0, 0, 2, 1);
+        // set minimum width for the chart to avoid awkward UI when window size is
+        // bigger than default
+        var chartWidth = new ColumnConstraints();
+        chartWidth.setPercentWidth(70);
+        pane.getColumnConstraints().addAll(new ColumnConstraints(), new ColumnConstraints(), chartWidth);
+
+        pane.add(segments, 0, 2, 2, 1);
         pane.add(chart.getNode(), 2, 1, 2, 2);
+
+        pane.add(menuBar, 0, 0, 2, 1);
         pane.add(add, 0, 1);
         pane.add(clear, 1, 1);
-        pane.add(segments, 0, 2, 2, 1);
 
         scene.setRoot(pane);
     }
