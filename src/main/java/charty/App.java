@@ -12,7 +12,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * The App.
@@ -56,7 +55,14 @@ public class App extends Application {
         var bar = new MenuBar();
 
         var fileMenu = new Menu("File");
-        bar.getMenus().addAll(fileMenu);
+        var helpMenu = new Menu("Help");
+        bar.getMenus().addAll(fileMenu, helpMenu);
+
+        var about = new MenuItem("About");
+        helpMenu.getItems().addAll(about);
+        about.setOnAction(actionEvent -> {
+            new Alert(AlertType.INFORMATION, "Charty - A chart making app.", ButtonType.CLOSE).showAndWait();
+        });
 
         var newSubMenu = new Menu("New");
         var newPieChart = new MenuItem("Pie chart");
@@ -86,7 +92,6 @@ public class App extends Application {
             }
             var f = new FileChooser();
             f.setTitle("Save as");
-            f.setSelectedExtensionFilter(new ExtensionFilter("PNG file", "*.png"));
             var file = f.showSaveDialog(stage);
             if (file != null) {
                 ImageExporter.exportPng(file, chart);
@@ -100,7 +105,6 @@ public class App extends Application {
             }
             var f = new FileChooser();
             f.setTitle("Save as");
-            f.setSelectedExtensionFilter(new ExtensionFilter("JPEG file", "*.jpeg", "*.jpg"));
             var file = f.showSaveDialog(stage);
             if (file != null) {
                 ImageExporter.exportPng(file, chart);

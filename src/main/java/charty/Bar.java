@@ -21,8 +21,8 @@ import javafx.util.Pair;
 
 /**
  * The BarChart, associated data and input recievers.
- * This is implementation involves using an intermediate List that is
- * transformed into an ObservableList and applied to the BarChart on every
+ * This implementation uses an intermediate List that is
+ * transformed into an ObservableList and attached to the BarChart on every
  * change.
  * 
  * @see <a href=
